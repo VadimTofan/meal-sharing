@@ -4,12 +4,12 @@ import { getMeals } from "./db.js";
 const port = 8000;
 const app = express();
 
-const error404 = "There are no meals for your request!";
-const mealError = (meals, response) => {
-  if (!meals.length) {
-    return response.status(404).json({ message: error404 });
+const mealNotFound = (meal, response) => {
+  const emptyData = "There are no meals for your request!";
+  if (meal === null) {
+    return response.json(emptyData);
   }
-  response.json(meals);
+  response.json(meal);
 };
 
 app.get("/", (request, response) => {
@@ -18,27 +18,27 @@ app.get("/", (request, response) => {
 
 app.get("/all-meals", async (request, response) => {
   const meals = await getMeals();
-  mealError(meals, response);
+  response.send(meals);
 });
 
 app.get("/future-meals", async (request, response) => {
   const meals = await getMeals("WHERE `when` > NOW()");
-  mealError(meals, response);
+  response.send(meals);
 });
 
 app.get("/past-meals", async (request, response) => {
   const meals = await getMeals("WHERE `when` < NOW()");
-  mealError(meals, response);
+  response.send(meals);
 });
 
 app.get("/first-meal", async (request, response) => {
-  const meals = await getMeals("WHERE `id` = 1");
-  mealError(meals, response);
+  const meal = await getMeals("WHERE `id` = 1");
+  mealNotFound(meal, response);
 });
 
 app.get("/last-meal", async (request, response) => {
-  const meals = await getMeals("WHERE `id` = (SELECT MAX(`id`) FROM meal)");
-  mealError(meals, response);
+  const meal = await getMeals("WHERE `id` = (SELECT MAX(`id`) FROM meal)");
+  mealNotFound(meal, response);
 });
 
 app.listen(port, () => {

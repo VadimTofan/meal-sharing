@@ -17,5 +17,7 @@ const dbClient = knex({
 export async function getMeals(condition = "") {
   const result = await dbClient.raw(`SELECT * FROM meal ${condition}`);
   const meals = result[0];
+  const meal = meals[0];
+  if (meals.length === 1) return meal;
   return meals;
 }
