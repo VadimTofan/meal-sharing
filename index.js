@@ -4,14 +4,6 @@ import { getMeals } from "./db.js";
 const port = 8000;
 const app = express();
 
-const mealNotFound = (meal, response) => {
-  const emptyData = "There are no meals for your request!";
-  if (meal === null) {
-    return response.json(emptyData);
-  }
-  response.json(meal);
-};
-
 app.get("/", (request, response) => {
   response.send("Welcome to Meal Sharing");
 });
@@ -32,13 +24,19 @@ app.get("/past-meals", async (request, response) => {
 });
 
 app.get("/first-meal", async (request, response) => {
-  const meal = await getMeals("WHERE `id` = 1");
-  mealNotFound(meal, response);
+  const meal = await getMeals("WHERE `id` = (SELECT MIN(`id`) FROM meal)");
+  if (!meal || (Array.isArray(meal) && meal.length === 0)) {
+    return response.send("There are no meals for your request!");
+  }
+  response.send(meal);
 });
 
 app.get("/last-meal", async (request, response) => {
   const meal = await getMeals("WHERE `id` = (SELECT MAX(`id`) FROM meal)");
-  mealNotFound(meal, response);
+  if (!meal || (Array.isArray(meal) && meal.length === 0)) {
+    return response.send("There are no meals for your request!");
+  }
+  response.send(meal);
 });
 
 app.listen(port, () => {
