@@ -1,41 +1,56 @@
-import express from "express";
-import { getMeals } from "./db.js";
+import express from 'express'
+import {
+  getFirstMeal,
+  getFutureMeals,
+  getLastMeal,
+  getMeals,
+  getPastMeals,
+} from './db.js'
 
-const app = express();
+const app = express()
 
-app.get("/", (request, response) => {
-  response.send("Welcome to Meal Sharing");
-});
+app.get('/', (request, response) => {
+  response.send('Welcome to Meal Sharing')
+})
 
-app.get("/all-meals", async (request, response) => {
-  const meals = await getMeals("meals");
-  response.send(meals);
-});
+app.get('/all-meals', async (request, response) => {
+  const meals = await getMeals('meals')
 
-app.get("/future-meals", async (request, response) => {
-  const meals = await getMeals("futureMeals");
-  response.send(meals);
-});
+  response.send(meals)
+})
 
-app.get("/past-meals", async (request, response) => {
-  const meals = await getMeals("pastMeals");
-  response.send(meals);
-});
+app.get('/future-meals', async (request, response) => {
+  const meals = await getFutureMeals()
 
-app.get("/first-meal", async (request, response) => {
-  const meal = await getMeals("firstMeal");
-  if (!meal || (Array.isArray(meal) && meal.length === 0)) return response.send("There are no meals for your request!");
-  response.send(meal);
-});
+  response.send(meals)
+})
 
-app.get("/last-meal", async (request, response) => {
-  const meal = await getMeals("lastMeal");
-  if (!meal || (Array.isArray(meal) && meal.length === 0)) return response.send("There are no meals for your request!");
-  response.send(meal);
-});
+app.get('/past-meals', async (request, response) => {
+  const meals = await getPastMeals()
 
-const port = 8000;
+  response.send(meals)
+})
+
+app.get('/first-meal', async (request, response) => {
+  const meal = await getFirstMeal()
+
+  if (!meal || Object.keys(meal).length === 0)
+    return response.send('There are no meals for your request!')
+
+  response.send(meal)
+})
+
+app.get('/last-meal', async (request, response) => {
+  const meal = await getLastMeal()
+
+  if (!meal || Object.keys(meal).length === 0)
+    return response.send('There are no meals for your request!')
+
+  response.send(meal)
+})
+
+const port = 8000
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+  console.log(`Server is running on http://localhost:${port}`)
+})
