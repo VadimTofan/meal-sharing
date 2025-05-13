@@ -15,9 +15,10 @@ const dbClient = knex({
 });
 
 export async function getMeals(condition = "") {
-  const result = await dbClient.raw(`SELECT * FROM meal ${condition}`);
-  const meals = result[0];
-  const meal = meals[0];
-  if (meals.length === 1) return meal;
-  return meals;
+  const now = new Date().toISOString();
+  if (condition === "meals") return await dbClient.select("*").from("meal");
+  if (condition === "pastMeals") return await dbClient.select("*").from("meal").where("when", "<", now);
+  if (condition === "futureMeals") return await dbClient.select("*").from("meal").where("when", ">", now);
+  if (condition === "firstMeal") return await dbClient.select("*").from("meal").orderBy("id").first();
+  if (condition === "lastMeal") return await dbClient.select("*").from("meal").orderBy("id", "desc").first();
 }
